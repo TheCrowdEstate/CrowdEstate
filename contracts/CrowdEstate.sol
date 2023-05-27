@@ -161,4 +161,19 @@ contract CrowdEstate is IErrors, IStructs, Ownable {
 
         payable(msg.sender).transfer(balance);
     }
+
+    /**
+     * @notice View the amount of sold property shares
+     * @param _propertyId The id of the property
+     */
+    function soldPropertyShares(
+        uint256 _propertyId
+    ) public view returns (uint256) {
+        if (_propertyId <= 0 || _propertyId > propertyCount)
+            revert InvalidPropertyId();
+
+        Property storage property = properties[_propertyId];
+
+        return (property.soldShares * 100) / property.shares;
+    }
 }
