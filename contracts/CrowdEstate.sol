@@ -168,12 +168,46 @@ contract CrowdEstate is IErrors, IStructs, Ownable {
      */
     function soldPropertyShares(
         uint256 _propertyId
-    ) public view returns (uint256) {
+    ) public view returns (string memory) {
         if (_propertyId <= 0 || _propertyId > propertyCount)
             revert InvalidPropertyId();
 
         Property storage property = properties[_propertyId];
 
-        return (property.soldShares * 100) / property.shares;
+        uint256 percentage = (property.soldShares * 10000) / property.shares;
+
+        string memory integerPart = uint256ToString(percentage / 100);
+        string memory decimalPart = uint256ToString(percentage % 100);
+
+        string memory result = string(
+            abi.encodePacked(integerPart, ".", decimalPart, "%")
+        );
+
+        return result;
+    }
+
+    function uint256ToString(
+        uint256 value
+    ) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+
+        uint256 temp = value;
+        uint256 digits;
+
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+
+        return string(buffer);
     }
 }
